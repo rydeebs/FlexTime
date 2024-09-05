@@ -1,24 +1,46 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Load saved settings
-    chrome.storage.sync.get(['workoutLevel', 'workSchedule', 'completedWorkouts'], function(data) {
-      document.getElementById('workoutLevel').value = data.workoutLevel || 'beginner';
+  // Load saved settings and update UI
+  chrome.storage.sync.get(['workoutLevel', 'workSchedule', 'completedWorkouts', 'weeklyGoal'], function(data) {
+      document.getElementById('workoutLevel').value = data.workoutLevel || 'Entry';
       document.getElementById('workStartTime').value = data.workSchedule.start || '09:00';
       document.getElementById('workEndTime').value = data.workSchedule.end || '17:00';
       document.getElementById('completedWorkouts').textContent = data.completedWorkouts || 0;
-    });
-  
-    // Save settings
-    document.getElementById('saveSettings').addEventListener('click', function() {
+      document.getElementById('weeklyGoal').textContent = data.weeklyGoal || 5;
+      updateProgressBar(data.completedWorkouts, data.weeklyGoal);
+  });
+
+  // Save settings
+  document.getElementById('saveSettings').addEventListener('click', function() {
       const workoutLevel = document.getElementById('workoutLevel').value;
       const workStartTime = document.getElementById('workStartTime').value;
       const workEndTime = document.getElementById('workEndTime').value;
-  
+
       chrome.storage.sync.set({
-        workoutLevel: workoutLevel,
-        workSchedule: { start: workStartTime, end: workEndTime, days: [1, 2, 3, 4, 5] }
+          workoutLevel: workoutLevel,
+          workSchedule: { start: workStartTime, end: workEndTime, days: [1, 2, 3, 4, 5] }
       }, function() {
-        console.log('Settings saved');
-        // You could add some visual feedback here to indicate successful save
+          // Update weekly goal based on new workout level
+          chrome.runtime.sendMessage({action: "updateWeeklyGoal", level: workoutLevel}, function(response) {
+              document.getElementById('weeklyGoal').textContent = response.newGoal;
+              updateProgressBar(response.completedWorkouts, response.newGoal);
+          });
+          showNotification('Settings saved successfully!');
       });
-    });
   });
+});
+
+function updateProgressBar(completed, goal) {
+  const progressBar = document.getElementById('progressBar');
+  const percentage = (completed / goal) * 100;
+  progressBar.value = percentage;
+}
+
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  notification.className = 'notification';
+  document.body.appendChild(notification);
+  setTimeout(() => {
+      notification.remove();
+  }, 3000);
+}

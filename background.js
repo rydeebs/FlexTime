@@ -144,3 +144,16 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     chrome.storage.sync.set({ completedWorkouts: 0 });
   }
 });
+
+// Add this new message listener
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "updateWeeklyGoal") {
+      const newGoal = WORKOUT_LEVELS[request.level].weekly_goal;
+      chrome.storage.sync.get(['completedWorkouts'], (data) => {
+          chrome.storage.sync.set({ weeklyGoal: newGoal }, () => {
+              sendResponse({ newGoal: newGoal, completedWorkouts: data.completedWorkouts });
+          });
+      });
+      return true; // Indicates that the response is sent asynchronously
+  }
+});

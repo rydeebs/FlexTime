@@ -1,32 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>WorkDay Workout</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkDay Workout</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>WorkDay Workout</h1>
-  <div>
-    <label for="workoutLevel">Workout Level:</label>
-    <select id="workoutLevel">
-      <option value="beginner">Beginner</option>
-      <option value="moderate">Moderate</option>
-      <option value="good">Good</option>
-      <option value="advanced">Advanced</option>
-    </select>
-  </div>
-  <div>
-    <h2>Work Schedule</h2>
-    <label for="workStartTime">Start Time:</label>
-    <input type="time" id="workStartTime">
-    <label for="workEndTime">End Time:</label>
-    <input type="time" id="workEndTime">
-  </div>
-  <div>
-    <h2>Progress</h2>
-    <p>Completed Workouts: <span id="completedWorkouts">0</span></p>
-  </div>
-  <button id="saveSettings">Save Settings</button>
-  <script src="popup.js"></script>
+    <div class="container">
+        <h1>WorkDay Workout</h1>
+        
+        <section id="progress">
+            <h2>Weekly Progress</h2>
+            <p>Completed Workouts: <span id="completedWorkouts">0</span> / <span id="weeklyGoal">5</span></p>
+            <progress id="progressBar" value="0" max="100"></progress>
+        </section>
+
+        <section id="settings">
+            <h2>Settings</h2>
+            <div class="setting">
+                <label for="workoutLevel">Workout Level:</label>
+                <select id="workoutLevel">
+                    <option value="Entry">Entry</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Boss">Boss</option>
+                    <option value="Goggins">Goggins</option>
+                </select>
+            </div>
+            <div class="setting">
+                <label for="workStartTime">Work Start Time:</label>
+                <input type="time" id="workStartTime">
+            </div>
+            <div class="setting">
+                <label for="workEndTime">Work End Time:</label>
+                <input type="time" id="workEndTime">
+            </div>
+            <button id="saveSettings">Save Settings</button>
+        </section>
+    </div>
+    <script src="popup.js"></script>
 </body>
 </html>

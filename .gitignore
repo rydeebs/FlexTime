@@ -1,0 +1,22 @@
+# Ignore OS generated files
+   .DS_Store
+   Thumbs.db
+
+   # Ignore node modules if you're using npm
+   node_modules/
+
+   # Ignore any log files
+   *.log
+
+   # Ignore VS Code settings
+   .vscode/
+
+   # Ignore any temporary files
+   *.tmp
+
+   # Ignore build output
+   dist/
+   build/
+
+   # Ignore personal API keys or secrets
+   secrets.json

@@ -1,33 +1,17 @@
 {
-    "manifest_version": 3,
-    "name": "WorkDay Workout",
-    "version": "1.0",
-    "description": "Encourages quick workouts during your workday based on your calendar availability.",
-    "permissions": [
-      "storage",
-      "alarms",
-      "notifications",
-      "identity",
-      "identity.email"
-    ],
-    "host_permissions": [
-      "https://www.googleapis.com/",
-      "https://outlook.office.com/api/"
-    ],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-        "16": "images/icon16.png",
-        "48": "images/icon48.png",
-        "128": "images/icon128.png"
-      }
-    },
-    "icons": {
-      "16": "images/icon16.png",
-      "48": "images/icon48.png",
-      "128": "images/icon128.png"
-    }
-  }
+  "manifest_version": 3,
+  "name": "WorkWell",
+  "version": "1.0",
+  "description": "Encourages quick workouts during your workday.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+}

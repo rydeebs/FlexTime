@@ -2,12 +2,39 @@ document.addEventListener('DOMContentLoaded', function() {
   // Load saved settings and update UI
   chrome.storage.sync.get(['workoutLevel', 'workSchedule', 'completedWorkouts', 'weeklyGoal'], function(data) {
       document.getElementById('workoutLevel').value = data.workoutLevel || 'Entry';
-      document.getElementById('workStartTime').value = data.workSchedule.start || '09:00';
-      document.getElementById('workEndTime').value = data.workSchedule.end || '17:00';
-      document.getElementById('completedWorkouts').textContent = data.completedWorkouts || 0;
-      document.getElementById('weeklyGoal').textContent = data.weeklyGoal || 5;
-      updateProgressBar(data.completedWorkouts, data.weeklyGoal);
+      document.getElementById('workStartTime').value = data.workSchedule?.start || '09:00';
+      document.getElementById('workEndTime').value = data.workSchedule?.end || '17:00';
+      
+      const completedWorkouts = data.completedWorkouts || 0;
+      const weeklyGoal = data.weeklyGoal || 5; // Default to 5 if not set
+      
+      document.getElementById('completedWorkouts').textContent = completedWorkouts;
+      document.getElementById('weeklyGoal').textContent = weeklyGoal;
+      
+      updateProgressBar(completedWorkouts, weeklyGoal);
   });
+
+  // ... rest of your existing code ...
+});
+
+function updateProgressBar(completed, goal) {
+  const progressBar = document.getElementById('progressBar');
+  if (!progressBar) {
+      console.error('Progress bar element not found');
+      return;
+  }
+  
+  if (typeof completed !== 'number' || typeof goal !== 'number' || goal <= 0) {
+      console.error('Invalid input for updateProgressBar', { completed, goal });
+      progressBar.value = 0;
+      return;
+  }
+
+  const percentage = Math.min(100, Math.max(0, (completed / goal) * 100));
+  progressBar.value = percentage;
+}
+
+// ... rest of your existing code ...
 
   // Save settings
   document.getElementById('saveSettings').addEventListener('click', function() {

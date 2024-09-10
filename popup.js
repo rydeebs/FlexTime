@@ -1,17 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Load saved settings and update UI
-  chrome.storage.sync.get(['workoutLevel', 'workSchedule', 'completedWorkouts', 'weeklyGoal'], function(data) {
+  chrome.storage.sync.get(['workoutLevel', 'workSchedule'], function(data) {
       document.getElementById('workoutLevel').value = data.workoutLevel || 'Entry';
       document.getElementById('workStartTime').value = data.workSchedule?.start || '09:00';
       document.getElementById('workEndTime').value = data.workSchedule?.end || '17:00';
-      
-      const completedWorkouts = data.completedWorkouts || 0;
-      const weeklyGoal = data.weeklyGoal || 5; // Default to 5 if not set
-      
-      document.getElementById('completedWorkouts').textContent = completedWorkouts;
-      document.getElementById('weeklyGoal').textContent = weeklyGoal;
-      
-      updateProgressBar(completedWorkouts, weeklyGoal);
   });
 
   // Save settings
@@ -28,24 +20,18 @@ document.addEventListener('DOMContentLoaded', function() {
           showNotification('Settings saved successfully!');
       });
   });
+
+  // Connect to Google Calendar
+  document.getElementById('connectToCalendar').addEventListener('click', function() {
+      chrome.runtime.sendMessage({action: "connectToCalendar"}, function(response) {
+          if (response && response.success) {
+              showNotification('Successfully connected to Google Calendar!');
+          } else {
+              showNotification('Failed to connect to Google Calendar. Please try again.');
+          }
+      });
+  });
 });
-
-function updateProgressBar(completed, goal) {
-  const progressBar = document.getElementById('progressBar');
-  if (!progressBar) {
-      console.error('Progress bar element not found');
-      return;
-  }
-  
-  if (typeof completed !== 'number' || typeof goal !== 'number' || goal <= 0) {
-      console.error('Invalid input for updateProgressBar', { completed, goal });
-      progressBar.value = 0;
-      return;
-  }
-
-  const percentage = Math.min(100, Math.max(0, (completed / goal) * 100));
-  progressBar.value = percentage;
-}
 
 function showNotification(message) {
   const notification = document.createElement('div');

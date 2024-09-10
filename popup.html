@@ -3,19 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkDay Workout</title>
+    <title>WorkWell</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>WorkDay Workout</h1>
+        <h1>WorkWell</h1>
         
-        <section id="progress">
-            <h2>Weekly Progress</h2>
-            <p>Completed Workouts: <span id="completedWorkouts">0</span> / <span id="weeklyGoal">5</span></p>
-            <progress id="progressBar" value="0" max="100"></progress>
-        </section>
-
         <section id="settings">
             <h2>Settings</h2>
             <div class="setting">
@@ -36,6 +30,11 @@
                 <input type="time" id="workEndTime">
             </div>
             <button id="saveSettings">Save Settings</button>
+        </section>
+
+        <section id="calendar">
+            <h2>Calendar Integration</h2>
+            <button id="connectToCalendar">Connect to Google Calendar</button>
         </section>
     </div>
     <script src="popup.js"></script>

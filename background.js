@@ -310,4 +310,48 @@ scheduleWorkouts();
 // Set up periodic scheduling
 chrome.alarms.create('periodicScheduling', { periodInMinutes: 60 });
 
+// Add this to your existing background.js file
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "connectToCalendar") {
+      connectToCalendar()
+          .then(() => sendResponse({success: true}))
+          .catch(error => {
+              console.error('Error connecting to calendar:', error);
+              sendResponse({success: false});
+          });
+      return true; // Indicates that the response is sent asynchronously
+  }
+});
+
+function connectToCalendar() {
+  return new Promise((resolve, reject) => {
+      chrome.identity.getAuthToken({interactive: true}, function(token) {
+          if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+          } else {
+              // Store the token or use it to make API calls
+              chrome.storage.sync.set({calendarToken: token}, function() {
+                  console.log('Calendar token saved');
+                  resolve();
+              });
+          }
+      });
+  });
+}
+
+// Make sure to update your fetchCalendarEvents function to use this token
+async function fetchCalendarEvents() {
+  return new Promise((resolve, reject) => {
+      chrome.storage.sync.get('calendarToken', async function(data) {
+          if (data.calendarToken) {
+              // Use data.calendarToken to make API calls
+              // ... (rest of your fetchCalendarEvents logic)
+          } else {
+              reject(new Error('No calendar token found. Please connect to Google Calendar first.'));
+          }
+      });
+  });
+}
+
 });

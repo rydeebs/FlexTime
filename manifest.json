@@ -9,9 +9,19 @@
   "permissions": [
     "storage",
     "alarms",
-    "notifications"
+    "notifications",
+    "identity"
+  ],
+  "host_permissions": [
+    "https://www.googleapis.com/"
   ],
   "background": {
     "service_worker": "background.js"
   },
+  "oauth2": {
+    "client_id": "528544209454-2fimspggacblf6absm9fj2tcigid7u2t.apps.googleusercontent.com.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/calendar.readonly"
+    ]
+  }
 }

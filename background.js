@@ -75,7 +75,15 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === 'checkCalendar') {
+  if (alarm.name === 'periodicScheduling') {
+    scheduleWorkouts();
+  } else if (alarm.name.startsWith('workout_')) {
+    // This is a workout alarm
+    const workoutTime = new Date(parseInt(alarm.name.split('_')[1]));
+    console.log(`Time for a workout! Scheduled at ${workoutTime}`);
+    // Here, trigger your workout notification or whatever action you want to take when it's time for a workout
+  } else if (alarm.name === 'checkCalendar') {
+    // Keep your existing checkCalendarAndTriggerWorkout() call here if you have one
     checkCalendarAndTriggerWorkout();
   }
 });
@@ -156,4 +164,150 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
       return true; // Indicates that the response is sent asynchronously
   }
+  let token = null;
+
+function getAuthToken() {
+  return new Promise((resolve, reject) => {
+    chrome.identity.getAuthToken({ interactive: true }, function(token) {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        resolve(token);
+      }
+    });
+  });
+}
+
+async function fetchCalendarEvents() {
+  try {
+    if (!token) {
+      token = await getAuthToken();
+    }
+
+    const now = new Date();
+    const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now.toISOString()}&timeMax=${oneWeekFromNow.toISOString()}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch calendar events');
+    }
+
+    const data = await response.json();
+    return data.items;
+  } catch (error) {
+    console.error('Error fetching calendar events:', error);
+    return [];
+  }
+}
+
+function findFreeTimeSlots(events, workSchedule) {
+  const freeSlots = [];
+  const now = new Date();
+  const endOfWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  for (let day = new Date(now); day < endOfWeek; day.setDate(day.getDate() + 1)) {
+    const dayOfWeek = day.getDay();
+    
+    // Check if it's a workday
+    if (workSchedule.days.includes(dayOfWeek)) {
+      const startTime = new Date(day.setHours(workSchedule.start.split(':')[0], workSchedule.start.split(':')[1]));
+      const endTime = new Date(day.setHours(workSchedule.end.split(':')[0], workSchedule.end.split(':')[1]));
+
+      let currentSlotStart = new Date(startTime);
+
+      events.forEach(event => {
+        const eventStart = new Date(event.start.dateTime || event.start.date);
+        const eventEnd = new Date(event.end.dateTime || event.end.date);
+
+        // If event is on the same day and overlaps with work hours
+        if (eventStart.toDateString() === day.toDateString() && 
+            eventStart < endTime && eventEnd > startTime) {
+          
+          // Add free slot before event if there's enough time
+          if (eventStart > currentSlotStart && (eventStart - currentSlotStart) >= 15 * 60 * 1000) {
+            freeSlots.push({
+              start: new Date(currentSlotStart),
+              end: new Date(eventStart)
+            });
+          }
+
+          currentSlotStart = new Date(Math.max(currentSlotStart, eventEnd));
+        }
+      });
+
+      // Add remaining time after last event
+      if (endTime > currentSlotStart && (endTime - currentSlotStart) >= 15 * 60 * 1000) {
+        freeSlots.push({
+          start: new Date(currentSlotStart),
+          end: new Date(endTime)
+        });
+      }
+    }
+  }
+
+  return freeSlots;
+}
+
+async function scheduleWorkouts() {
+  const events = await fetchCalendarEvents();
+  
+  chrome.storage.sync.get(['workSchedule', 'workoutLevel'], function(data) {
+    const freeTimeSlots = findFreeTimeSlots(events, data.workSchedule);
+    // Use freeTimeSlots and data.workoutLevel to schedule workouts
+    console.log('Free time slots:', freeTimeSlots);
+    // Implement workout scheduling logic here
+  });
+}
+
+// Add this line to your existing alarm listener
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'checkCalendar') {
+    scheduleWorkouts();
+    // Keep your existing checkCalendarAndTriggerWorkout() call here if you have one
+  }
+});
+
+// Initial run
+scheduleWorkouts();
+
+async function scheduleWorkouts() {
+  const events = await fetchCalendarEvents();
+  
+  chrome.storage.sync.get(['workSchedule', 'workoutLevel', 'weeklyGoal'], function(data) {
+    const freeTimeSlots = findFreeTimeSlots(events, data.workSchedule);
+    console.log('Free time slots:', freeTimeSlots);
+
+    // Determine how many workouts to schedule based on weeklyGoal
+    const workoutsToSchedule = Math.min(freeTimeSlots.length, data.weeklyGoal);
+
+    // Randomly select time slots for workouts
+    const selectedSlots = [];
+    for (let i = 0; i < workoutsToSchedule; i++) {
+      const randomIndex = Math.floor(Math.random() * freeTimeSlots.length);
+      selectedSlots.push(freeTimeSlots.splice(randomIndex, 1)[0]);
+    }
+
+    // Schedule workouts for the selected slots
+    selectedSlots.forEach(slot => {
+      const workout = getRandomExercise(data.workoutLevel);
+      console.log(`Scheduled workout: ${workout} at ${slot.start}`);
+      // Create an alarm for this workout
+      chrome.alarms.create(`workout_${slot.start.getTime()}`, {
+        when: slot.start.getTime()
+      });
+    });
+  });
+}
+
+// Initial run
+scheduleWorkouts();
+
+// Set up periodic scheduling
+chrome.alarms.create('periodicScheduling', { periodInMinutes: 60 });
+
 });

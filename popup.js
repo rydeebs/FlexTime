@@ -31,7 +31,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function updateProgressBar(completed, goal) {
   const progressBar = document.getElementById('progressBar');
-  const percentage = (completed / goal) * 100;
+  if (!progressBar) {
+      console.error('Progress bar element not found');
+      return;
+  }
+  
+  if (typeof completed !== 'number' || typeof goal !== 'number' || goal <= 0) {
+      console.error('Invalid input for updateProgressBar', { completed, goal });
+      progressBar.value = 0;
+      return;
+  }
+
+  const percentage = Math.min(100, Math.max(0, (completed / goal) * 100));
   progressBar.value = percentage;
 }
 

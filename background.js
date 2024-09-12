@@ -38,19 +38,46 @@ function isWorkingHours(schedule) {
 }
 
 function connectToCalendar() {
+  console.log('Attempting to connect to Google Calendar');
   return new Promise((resolve, reject) => {
-    chrome.identity.getAuthToken({interactive: true}, function(token) {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError);
-      } else {
-        chrome.storage.sync.set({calendarToken: token}, function() {
-          console.log('Calendar token saved');
-          resolve(token);
-        });
-      }
-    });
+      chrome.identity.getAuthToken({interactive: true}, function(token) {
+          if (chrome.runtime.lastError) {
+              console.error('Error getting auth token:', chrome.runtime.lastError);
+              reject(chrome.runtime.lastError);
+          } else if (!token) {
+              console.error('No token received');
+              reject(new Error('No token received'));
+          } else {
+              console.log('Auth token received successfully');
+              chrome.storage.sync.set({calendarToken: token}, function() {
+                  if (chrome.runtime.lastError) {
+                      console.error('Error saving token:', chrome.runtime.lastError);
+                      reject(chrome.runtime.lastError);
+                  } else {
+                      console.log('Calendar token saved successfully');
+                      resolve(token);
+                  }
+              });
+          }
+      });
   });
 }
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('Received message:', request);
+  if (request.action === "connectToCalendar") {
+      connectToCalendar()
+          .then(() => {
+              console.log('Calendar connected successfully');
+              sendResponse({success: true});
+          })
+          .catch(error => {
+              console.error('Error connecting to calendar:', error);
+              sendResponse({success: false, error: error.message});
+          });
+      return true; // Indicates that the response is sent asynchronously
+  }
+});
 
 async function fetchCalendarEvents() {
   if (!token) {
@@ -141,7 +168,9 @@ chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) =
   }
 });
 
+// Combined message listener
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('Received message:', request);
   if (request.action === "updateWeeklyGoal") {
     const newGoal = WORKOUT_LEVELS[request.level].weekly_goal;
     chrome.storage.sync.get(['completedWorkouts'], (data) => {
@@ -151,8 +180,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     return true;
   } else if (request.action === "connectToCalendar") {
+    console.log('Connecting to calendar...');
     connectToCalendar()
-      .then(() => sendResponse({success: true}))
+      .then(() => {
+        console.log('Calendar connected successfully');
+        sendResponse({success: true});
+      })
       .catch(error => {
         console.error('Error connecting to calendar:', error);
         sendResponse({success: false, error: error.message});

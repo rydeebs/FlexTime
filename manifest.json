@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "DOIT",
+  "name": "FlexTime",
   "version": "1.0",
   "description": "Encourages quick workouts during your workday.",
   "permissions": [
@@ -25,6 +25,5 @@
     "scopes": [
       "https://www.googleapis.com/auth/calendar.readonly"
     ]
-  },
-  "ms_client_id": "d674152d-b445-42a3-b369-56d2a8b88002"
+  }
 }

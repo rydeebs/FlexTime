@@ -1,3 +1,5 @@
+const MS_CLIENT_ID = 'd674152d-b445-42a3-b369-56d2a8b88002';
+
 // Constants
 const WORKOUT_LEVELS = {
   Entry: { weekly_goal: 5, exercises: [
@@ -213,7 +215,6 @@ function triggerWorkoutNotification() {
 
 function connectToOutlook() {
   return new Promise((resolve, reject) => {
-    const clientId = chrome.runtime.getManifest().ms_client_id;
     const redirectUri = chrome.identity.getRedirectURL();
     const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${d674152d-b445-42a3-b369-56d2a8b88002}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent('https://graph.microsoft.com/Calendars.Read')}&response_mode=fragment`;
 

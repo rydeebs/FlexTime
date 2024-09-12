@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "WorkWell",
+  "name": "DOIT",
   "version": "1.0",
   "description": "Encourages quick workouts during your workday.",
   "permissions": [
@@ -10,7 +10,8 @@
     "identity"
   ],
   "host_permissions": [
-    "https://www.googleapis.com/"
+    "https://www.googleapis.com/",
+    "https://graph.microsoft.com/"
   ],
   "action": {
     "default_popup": "popup.html"
@@ -24,5 +25,6 @@
     "scopes": [
       "https://www.googleapis.com/auth/calendar.readonly"
     ]
-  }
+  },
+  "ms_client_id": "d674152d-b445-42a3-b369-56d2a8b88002"
 }

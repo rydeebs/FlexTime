@@ -158,7 +158,7 @@ chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) =
           type: 'basic',
           iconUrl: 'images/icon128.png',
           title: 'Weekly Goal Achieved!',
-          message: 'Congratulations! You've reached your workout goal for the week.',
+          message: 'Congratulations! You have reached your workout goal for the week.',
         });
       }
     });
@@ -210,6 +210,60 @@ function triggerWorkoutNotification() {
     });
   });
 }
+
+function connectToOutlook() {
+  return new Promise((resolve, reject) => {
+    const clientId = chrome.runtime.getManifest().ms_client_id;
+    const redirectUri = chrome.identity.getRedirectURL();
+    const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${d674152d-b445-42a3-b369-56d2a8b88002}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent('https://graph.microsoft.com/Calendars.Read')}&response_mode=fragment`;
+
+    chrome.identity.launchWebAuthFlow({
+      url: authUrl,
+      interactive: true
+    }, function(redirectUrl) {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        const url = new URL(redirectUrl);
+        const params = new URLSearchParams(url.hash.slice(1));
+        const token = params.get('access_token');
+        if (token) {
+          chrome.storage.sync.set({outlookToken: token}, function() {
+            resolve(token);
+          });
+        } else {
+          reject(new Error('Failed to get token'));
+        }
+      }
+    });
+  });
+}
+
+async function fetchOutlookEvents() {
+  const token = await new Promise((resolve) => chrome.storage.sync.get('outlookToken', data => resolve(data.outlookToken)));
+  if (!token) throw new Error('No Outlook token found');
+
+  const response = await fetch('https://graph.microsoft.com/v1.0/me/calendar/events', {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) throw new Error('Failed to fetch Outlook events');
+
+  const data = await response.json();
+  return data.value;
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "connectToOutlook") {
+    connectToOutlook()
+      .then(() => sendResponse({success: true}))
+      .catch(error => sendResponse({success: false, error: error.message}));
+    return true; // Indicates that the response is sent asynchronously
+  }
+});
 
 // Initial run
 scheduleWorkouts();

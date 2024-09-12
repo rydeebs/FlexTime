@@ -47,6 +47,22 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification('Failed to connect to Google Calendar: ' + (response ? response.error : 'Unknown error'));
         }
     });
+
+    // Connect to Outlook Calendar
+    document.getElementById('connectToOutlook').addEventListener('click', function() {
+        chrome.runtime.sendMessage({ action: "connectToOutlook" }, function(response) {
+            if (chrome.runtime.lastError) {
+                console.error('Error:', chrome.runtime.lastError);
+                showNotification('Error connecting to Outlook Calendar');
+            } else if (response && response.success) {
+                console.log('Successfully connected to Outlook Calendar!');
+                showNotification('Successfully connected to Outlook Calendar!');
+            } else {
+                console.error('Failed to connect to Outlook Calendar:', response ? response.error : 'Unknown error');
+                showNotification('Failed to connect to Outlook Calendar. Please try again.');
+            }
+        });
+    });
 });
 
 function setElementValue(id, value) {

@@ -1,87 +1,148 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Popup DOM fully loaded');
-
-    // Load saved settings and update UI
-    chrome.storage.sync.get(['workoutLevel', 'workSchedule'], function(data) {
-        console.log('Retrieved data from storage:', data);
-        setElementValue('workoutLevel', data.workoutLevel || 'Entry');
-        setElementValue('workStartTime', data.workSchedule?.start || '09:00');
-        setElementValue('workEndTime', data.workSchedule?.end || '17:00');
-    });
-
-    // Save settings
-    document.getElementById('saveSettings').addEventListener('click', function() {
-        console.log('Save Settings button clicked');
-        const workoutLevel = getElementValue('workoutLevel');
-        const workStartTime = getElementValue('workStartTime');
-        const workEndTime = getElementValue('workEndTime');
-
-        chrome.storage.sync.set({
-            workoutLevel: workoutLevel,
-            workSchedule: { start: workStartTime, end: workEndTime, days: [1, 2, 3, 4, 5] }
-        }, function() {
-            console.log('Settings saved');
-            showNotification('Settings saved successfully!');
-        });
-    });
-
-    // Connect to Google Calendar
-    document.getElementById('connectToGoogle').addEventListener('click', function() {
-        console.log('Connect to Google Calendar button clicked');
-        chrome.runtime.sendMessage({action: "connectToGoogle"}, function(response) {
-            console.log('Received response from Google connection attempt:', response);
-            if (chrome.runtime.lastError) {
-                console.error('Chrome runtime error:', chrome.runtime.lastError);
-                showNotification('Error connecting to Google Calendar: ' + chrome.runtime.lastError.message);
-            } else if (response && response.success) {
-                console.log('Successfully connected to Google Calendar');
-                showNotification('Successfully connected to Google Calendar!');
-            } else {
-                console.error('Failed to connect to Google Calendar:', response ? response.error : 'Unknown error');
-                showNotification('Failed to connect to Google Calendar. Please try again.');
-            }
-        });
-    });
-
-    // Connect to Outlook Calendar
-    document.getElementById('connectToOutlook').addEventListener('click', function() {
-        console.log('Connect to Outlook Calendar button clicked');
-        chrome.runtime.sendMessage({action: "connectToOutlook"}, function(response) {
-            console.log('Received response from Outlook connection attempt:', response);
-            if (chrome.runtime.lastError) {
-                console.error('Chrome runtime error:', chrome.runtime.lastError);
-                showNotification('Error connecting to Outlook Calendar: ' + chrome.runtime.lastError.message);
-            } else if (response && response.success) {
-                console.log('Successfully connected to Outlook Calendar');
-                showNotification('Successfully connected to Outlook Calendar!');
-            } else {
-                console.error('Failed to connect to Outlook Calendar:', response ? response.error : 'Unknown error');
-                showNotification('Failed to connect to Outlook Calendar. Please try again.');
-            }
-        });
-    });
+    checkLoginStatus();
+    setupEventListeners();
 });
 
-function setElementValue(id, value) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.value = value;
-    } else {
-        console.warn(`Element with id "${id}" not found`);
-    }
+function checkLoginStatus() {
+    chrome.storage.sync.get(['googleToken', 'outlookToken', 'userName'], function(data) {
+        if (data.googleToken || data.outlookToken) {
+            showMainView(data.userName || 'User');
+        } else {
+            showLoginView();
+        }
+    });
 }
 
-function getElementValue(id) {
-    const element = document.getElementById(id);
-    return element ? element.value : null;
+function setupEventListeners() {
+    document.getElementById('connectToGoogle').addEventListener('click', connectToGoogle);
+    document.getElementById('connectToOutlook').addEventListener('click', connectToOutlook);
+    document.getElementById('prev-week').addEventListener('click', showPreviousWeek);
+    document.getElementById('next-week').addEventListener('click', showNextWeek);
+    document.getElementById('log-exercise').addEventListener('click', logExercise);
+}
+
+function showLoginView() {
+    document.getElementById('login-view').style.display = 'block';
+    document.getElementById('main-view').style.display = 'none';
+}
+
+function showMainView(userName) {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('main-view').style.display = 'block';
+    document.getElementById('user-name').textContent = userName;
+
+    updateWeekView();
+    updateExerciseList();
+    updateTotalExercises();
+}
+
+function connectToGoogle() {
+    chrome.runtime.sendMessage({action: "connectToGoogle"}, function(response) {
+        if (response && response.success) {
+            showNotification('Successfully connected to Google Calendar!');
+            showMainView('Google User');
+        } else {
+            showNotification('Failed to connect to Google Calendar. Please try again.');
+        }
+    });
+}
+
+function connectToOutlook() {
+    chrome.runtime.sendMessage({action: "connectToOutlook"}, function(response) {
+        if (response && response.success) {
+            showNotification('Successfully connected to Outlook Calendar!');
+            showMainView('Outlook User');
+        } else {
+            showNotification('Failed to connect to Outlook Calendar. Please try again.');
+        }
+    });
+}
+
+function updateWeekView() {
+    const weekView = document.getElementById('week-view');
+    weekView.innerHTML = '';
+
+    const today = new Date();
+    const currentDay = today.getDay();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - currentDay);
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + i);
+        
+        const dayElement = document.createElement('div');
+        dayElement.className = 'day';
+        if (i === currentDay) {
+            dayElement.classList.add('current');
+        }
+
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+        const dayNumber = date.getDate();
+
+        dayElement.innerHTML = `
+            <div>${dayName}</div>
+            <div>${dayNumber}</div>
+            <div class="exercise-count">0</div>
+        `;
+
+        weekView.appendChild(dayElement);
+    }
+
+    // TODO: Fetch and update exercise counts for each day
+}
+
+function updateExerciseList() {
+    const exerciseList = document.getElementById('exercise-list');
+    exerciseList.innerHTML = '';
+
+    const exercises = ['Lunges', 'Pushups', 'Situps', 'Squats'];
+    exercises.forEach(exercise => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>${exercise}</span>
+            <span class="exercise-count">0</span>
+        `;
+        exerciseList.appendChild(li);
+    });
+
+    // TODO: Fetch and update exercise counts
+}
+
+function updateTotalExercises() {
+    // TODO: Fetch total exercise count and update
+    document.getElementById('total-exercises').textContent = '0';
+}
+
+function showPreviousWeek() {
+    // TODO: Implement previous week view
+    console.log('Show previous week');
+}
+
+function showNextWeek() {
+    // TODO: Implement next week view
+    console.log('Show next week');
+}
+
+function logExercise() {
+    // TODO: Implement exercise logging
+    console.log('Log exercise');
+    showNotification('Exercise logged!');
 }
 
 function showNotification(message) {
-    console.log('Showing notification:', message);
     const notification = document.createElement('div');
     notification.textContent = message;
-    notification.className = 'notification';
+    notification.style.position = 'fixed';
+    notification.style.top = '10px';
+    notification.style.left = '50%';
+    notification.style.transform = 'translateX(-50%)';
+    notification.style.backgroundColor = '#4CAF50';
+    notification.style.color = 'white';
+    notification.style.padding = '10px';
+    notification.style.borderRadius = '5px';
     document.body.appendChild(notification);
+
     setTimeout(() => {
         notification.remove();
     }, 3000);

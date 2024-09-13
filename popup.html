@@ -7,36 +7,30 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>WorkDay Workout</h1>
-        
-        <section id="settings">
-            <h2>Settings</h2>
-            <div class="setting">
-                <label for="workoutLevel">Workout Level:</label>
-                <select id="workoutLevel">
-                    <option value="Entry">Entry</option>
-                    <option value="Senior">Senior</option>
-                    <option value="Boss">Boss</option>
-                    <option value="Goggins">Goggins</option>
-                </select>
+    <div id="login-view">
+        <h1>FlexTime</h1>
+        <p>Connect your calendar to get started:</p>
+        <button id="connectToGoogle">Connect to Google Calendar</button>
+        <button id="connectToOutlook">Connect to Outlook Calendar</button>
+    </div>
+    <div id="main-view" style="display: none;">
+        <header>
+            <h1>FlexTime</h1>
+            <div class="user-info">
+                <span id="trophy-count">🏆 <span id="total-exercises">0</span></span>
+                <span id="user-profile">👤 <span id="user-name">User</span></span>
             </div>
-            <div class="setting">
-                <label for="workStartTime">Work Start Time:</label>
-                <input type="time" id="workStartTime">
-            </div>
-            <div class="setting">
-                <label for="workEndTime">Work End Time:</label>
-                <input type="time" id="workEndTime">
-            </div>
-            <button id="saveSettings">Save Settings</button>
-        </section>
-
-        <section id="calendar-integration">
-            <h2>Calendar Integration</h2>
-            <button id="connectToGoogle">Connect to Google Calendar</button>
-            <button id="connectToOutlook">Connect to Outlook Calendar</button>
-        </section>
+        </header>
+        <div class="calendar">
+            <button id="prev-week">←</button>
+            <div id="week-view"></div>
+            <button id="next-week">→</button>
+        </div>
+        <div class="exercises">
+            <h2>Exercises</h2>
+            <ul id="exercise-list"></ul>
+        </div>
+        <button id="log-exercise">Log Exercise</button>
     </div>
     <script src="popup.js"></script>
 </body>

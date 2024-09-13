@@ -17,6 +17,10 @@ chrome.runtime.onInstalled.addListener(() => {
         workSchedule: { start: '09:00', end: '17:00', days: [1, 2, 3, 4, 5] },
         completedWorkouts: 0,
         weeklyGoal: WORKOUT_LEVELS.Entry.weekly_goal
+    }, () => {
+        if (chrome.runtime.lastError) {
+            console.error('Error setting initial storage:', chrome.runtime.lastError);
+        }
     });
     chrome.alarms.create('checkCalendar', { periodInMinutes: 30 });
     chrome.alarms.create('resetWeeklyProgress', {
@@ -165,20 +169,22 @@ async function scheduleWorkouts() {
         const outlookEvents = await fetchOutlookEvents();
         const allEvents = [...googleEvents, ...outlookEvents];
 
-        chrome.storage.sync.get(['workSchedule', 'workoutLevel', 'weeklyGoal'], function(data) {
-            const freeTimeSlots = findFreeTimeSlots(allEvents, data.workSchedule);
-            console.log('Free time slots:', freeTimeSlots);
+        const data = await new Promise((resolve) => 
+            chrome.storage.sync.get(['workSchedule', 'workoutLevel', 'weeklyGoal'], resolve)
+        );
 
-            const workoutsToSchedule = Math.min(freeTimeSlots.length, data.weeklyGoal);
-            for (let i = 0; i < workoutsToSchedule; i++) {
-                const slot = freeTimeSlots[i];
-                const workout = getRandomExercise(data.workoutLevel);
-                console.log(`Scheduled workout: ${workout} at ${slot.start}`);
-                chrome.alarms.create(`workout_${slot.start.getTime()}`, {
-                    when: slot.start.getTime()
-                });
-            }
-        });
+        const freeTimeSlots = findFreeTimeSlots(allEvents, data.workSchedule);
+        console.log('Free time slots:', freeTimeSlots);
+
+        const workoutsToSchedule = Math.min(freeTimeSlots.length, data.weeklyGoal);
+        for (let i = 0; i < workoutsToSchedule; i++) {
+            const slot = freeTimeSlots[i];
+            const workout = getRandomExercise(data.workoutLevel);
+            console.log(`Scheduled workout: ${workout} at ${slot.start}`);
+            chrome.alarms.create(`workout_${slot.start.getTime()}`, {
+                when: slot.start.getTime()
+            });
+        }
     } catch (error) {
         console.error('Error scheduling workouts:', error);
     }
@@ -216,7 +222,7 @@ chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) =
                         type: 'basic',
                         iconUrl: 'icon128.png',
                         title: 'Weekly Goal Achieved!',
-                        message: 'Congratulations! You've reached your workout goal for the week.'
+                        message: 'Congratulations! You\'ve reached your workout goal for the week.'
                     });
                 }
             });
@@ -224,5 +230,17 @@ chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) =
     } else {
         console.log('Workout skipped. $2 payment required.');
         // Implement payment logic here
+        processPayment(2).then(() => {
+            console.log('Payment processed successfully');
+        }).catch((error) => {
+            console.error('Payment processing failed:', error);
+        });
     }
 });
+
+function processPayment(amount) {
+    // Implement your payment processing logic here
+    return new Promise((resolve, reject) => {
+        // ... payment processing ...
+    });
+}

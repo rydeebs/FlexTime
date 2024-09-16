@@ -4,26 +4,22 @@
   "version": "1.0",
   "description": "Encourages quick workouts during your workday.",
   "permissions": [
+    "identity",
     "storage",
     "alarms",
-    "notifications",
-    "identity"
+    "notifications"
   ],
   "host_permissions": [
-    "https://www.googleapis.com/",
-    "https://graph.microsoft.com/"
+    "https://www.googleapis.com/"
   ],
   "action": {
     "default_popup": "popup.html"
   },
   "background": {
-    "service_worker": "background.js",
-    "type": "module"
+    "service_worker": "background.js"
   },
   "oauth2": {
     "client_id": "528544209454-2fimspggacblf6absm9fj2tcigid7u2t.apps.googleusercontent.com",
-    "scopes": [
-      "https://www.googleapis.com/auth/calendar.readonly"
-    ]
+    "scopes": ["https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
   }
 }

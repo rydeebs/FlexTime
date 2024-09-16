@@ -37,21 +37,41 @@ function showMainView(userName) {
 }
 
 function connectToGoogle() {
-    chrome.runtime.sendMessage({action: "connectToGoogle"}, function(response) {
-        if (response && response.success) {
-            showNotification('Successfully connected to Google Calendar!');
-            showMainView('Google User');
-        } else {
+    chrome.identity.getAuthToken({ interactive: true }, function(token) {
+        if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError);
             showNotification('Failed to connect to Google Calendar. Please try again.');
+            return;
         }
+        
+        fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
+            headers: { Authorization: 'Bearer ' + token }
+        })
+        .then(response => response.json())
+        .then(data => {
+            chrome.storage.sync.set({
+                googleToken: token,
+                userName: data.name
+            }, function() {
+                showMainView(data.name);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching user info:', error);
+            showNotification('Failed to get user info. Please try again.');
+        });
     });
 }
 
 function connectToOutlook() {
     chrome.runtime.sendMessage({action: "connectToOutlook"}, function(response) {
         if (response && response.success) {
-            showNotification('Successfully connected to Outlook Calendar!');
-            showMainView('Outlook User');
+            chrome.storage.sync.set({
+                outlookToken: response.token,
+                userName: response.userName
+            }, function() {
+                showMainView(response.userName);
+            });
         } else {
             showNotification('Failed to connect to Outlook Calendar. Please try again.');
         }

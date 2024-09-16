@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     width: 300px;
     margin: 0;
     padding: 10px;
@@ -17,6 +17,7 @@ header {
 }
 
 h1 {
+    font-family: 'Financier Display Web', Georgia, 'Times New Roman', serif;
     margin: 0;
     font-size: 24px;
 }
@@ -94,4 +95,65 @@ button:hover {
 #prev-week, #next-week {
     width: auto;
     padding: 5px 10px;
+}
+
+.google-btn, .microsoft-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.google-btn {
+    background-color: #4285F4;
+    color: white;
+}
+
+.microsoft-btn {
+    background-color: white;
+    color: #5E5E5E;
+    border: 1px solid #8C8C8C;
+}
+
+.google-icon, .microsoft-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    background-size: cover;
+}
+
+.google-icon {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHBhdGggZmlsbD0iI0ZGQzEwNyIgZD0iTTQzLjYxMSwyMC4wODNIMDV2OGg4LjMzM3YzLjkxMmMwLDQuMjQ1LDEuNDU0LDcuNzYsNC4wNDUsMTAuMzA1YzIuMzQyLDIuNDI5LDUuMjIsNC4xMjMsOC4zMzMsNC43djAuOTE2aDE2LjY2N1YzMkg0My42MTFWMjAuMDgzeiIvPjxwYXRoIGZpbGw9IiMwRjlENTgiIGQ9Ik0zMC4xMzksNDhWMzEuMDgzaDEzLjQ3MlYyMC4wODNIMHY4aDEzLjQ3MnYzLjkxMmMwLDQuMjQ1LDEuNDU0LDcuNzYsNC4wNDUsMTAuMzA1YzIuMzQyLDIuNDI5LDUuMjIsNC4xMjMsOC4zMzMsNC43VjQ4SDMwLjEzOXoiLz48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNMjUuMjc4LDM0djRoNC44NjF2LTRIMjUuMjc4eiIvPjxwYXRoIGZpbGw9IiMxODgwMzgiIGQ9Ik0zMC4xMzksMzhIMzJ2MTBoLTEuODYxVjM4eiIvPjxwYXRoIGZpbGw9IiNEMzJGMkYiIGQ9Ik0yNS4yNzgsMzR2M2g0Ljg2MXYtM0gyNS4yNzh6Ii8+PHBhdGggZmlsbD0iI0ZGQzEwNyIgZD0iTTIxLjQxNyw0NHYtMy45MTJjLTMuMTEzLTAuNTc3LTUuOTkxLTIuMjcxLTguMzMzLTQuN2MtMi41OTEtMi41NDUtNC4wNDUtNi4wNi00LjA0NS0xMC4zMDVWMjBIMHY4aDEzLjQ3MnYzLjkxMmMwLDQuMjQ1LDEuNDU0LDcuNzYsNC4wNDUsMTAuMzA1YzIuMzQyLDIuNDI5LDUuMjIsNC4xMjMsOC4zMzMsNC43VjQ0SDIxLjQxN3oiLz48L3N2Zz4=');
+}
+
+.microsoft-icon {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMyAyMyI+PHBhdGggZmlsbD0iI2YzNTMyNiIgZD0iTTEgMWg5djloLTl6Ii8+PHBhdGggZmlsbD0iIzgxYmMwNiIgZD0iTTEgMTNoOXY5aC05eiIvPjxwYXRoIGZpbGw9IiMwNWE2ZjAiIGQ9Ik0xMyAxMWg5djloLTl6Ii8+PHBhdGggZmlsbD0iI2ZmYmEwOCIgZD0iTTEzIDFoOXY5aC05eiIvPjwvc3ZnPg==');
+}
+
+@font-face {
+    font-family: 'Financier Display Web';
+    src: url('path-to-your-font/FinancierDisplayWeb-Semibold.woff2') format('woff2'),
+         url('path-to-your-font/FinancierDisplayWeb-Semibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    width: 300px;
+    margin: 0;
+    padding: 10px;
+}
+
+h1 {
+    font-family: 'Financier Display Web', serif;
+    font-weight: 600;
+    font-size: 24px;
+    margin-bottom: 20px;
 }

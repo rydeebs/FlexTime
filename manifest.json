@@ -3,6 +3,19 @@
   "name": "FlexTime",
   "version": "1.0",
   "description": "Encourages quick workouts during your workday.",
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
   "permissions": [
     "identity",
     "storage",
@@ -10,16 +23,18 @@
     "notifications"
   ],
   "host_permissions": [
-    "https://www.googleapis.com/"
+    "https://www.googleapis.com/",
+    "https://graph.microsoft.com/"
   ],
-  "action": {
-    "default_popup": "popup.html"
-  },
   "background": {
     "service_worker": "background.js"
   },
   "oauth2": {
-    "client_id": "528544209454-2fimspggacblf6absm9fj2tcigid7u2t.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
+    "client_id": "557949130808-esoftroaka1it7d6cbtjrue5uo6lr72j.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/calendar.readonly"
+    ]
   }
 }

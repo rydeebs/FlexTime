@@ -1,11 +1,16 @@
+// Constants
+const GOOGLE_CLIENT_ID = '557949130808-esoftroaka1it7d6cbtjrue5uo6lr72j.apps.googleusercontent.com';
+const MS_CLIENT_ID = 'dd4c37c3-3a02-44e3-9947-df74b9b56c2b';
+const MS_REDIRECT_URI = 'https://dd4c37c3-3a02-44e3-9947-df74b9b56c2b.chromiumapp.org/';
+
 document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
     setupEventListeners();
 });
 
 function checkLoginStatus() {
-    chrome.storage.sync.get(['googleToken', 'outlookToken', 'userName'], function(data) {
-        if (data.googleToken || data.outlookToken) {
+    chrome.storage.sync.get(['googleToken', 'microsoftToken', 'userName'], function(data) {
+        if (data.googleToken || data.microsoftToken) {
             showMainView(data.userName || 'User');
         } else {
             showLoginView();
@@ -15,7 +20,7 @@ function checkLoginStatus() {
 
 function setupEventListeners() {
     document.getElementById('connectToGoogle').addEventListener('click', connectToGoogle);
-    document.getElementById('connectToOutlook').addEventListener('click', connectToOutlook);
+    document.getElementById('connectToOutlook').addEventListener('click', connectToMicrosoft);
     document.getElementById('prev-week').addEventListener('click', showPreviousWeek);
     document.getElementById('next-week').addEventListener('click', showNextWeek);
     document.getElementById('log-exercise').addEventListener('click', logExercise);
@@ -63,17 +68,42 @@ function connectToGoogle() {
     });
 }
 
-function connectToOutlook() {
-    chrome.runtime.sendMessage({action: "connectToOutlook"}, function(response) {
-        if (response && response.success) {
-            chrome.storage.sync.set({
-                outlookToken: response.token,
-                userName: response.userName
-            }, function() {
-                showMainView(response.userName);
+function connectToMicrosoft() {
+    const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${encodeURIComponent(MS_CLIENT_ID)}&response_type=token&redirect_uri=${encodeURIComponent(MS_REDIRECT_URI)}&scope=${encodeURIComponent('https://graph.microsoft.com/Calendars.Read')}&response_mode=fragment`;
+
+    chrome.identity.launchWebAuthFlow({
+        url: authUrl,
+        interactive: true
+    }, function(redirectUrl) {
+        if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError);
+            showNotification('Failed to connect to Microsoft Calendar. Please try again.');
+            return;
+        }
+
+        const url = new URL(redirectUrl);
+        const params = new URLSearchParams(url.hash.slice(1));
+        const token = params.get('access_token');
+
+        if (token) {
+            fetch('https://graph.microsoft.com/v1.0/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(data => {
+                chrome.storage.sync.set({
+                    microsoftToken: token,
+                    userName: data.displayName
+                }, function() {
+                    showMainView(data.displayName);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching user info:', error);
+                showNotification('Failed to get user info. Please try again.');
             });
         } else {
-            showNotification('Failed to connect to Outlook Calendar. Please try again.');
+            showNotification('Failed to connect to Microsoft Calendar. Please try again.');
         }
     });
 }

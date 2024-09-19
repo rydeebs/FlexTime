@@ -8,36 +8,19 @@
 </head>
 <body>
     <div id="login-view">
-        <h1>FlexTime</h1>
-        <p>Connect your calendar to get started:</p>
-        <button id="connectToGoogle" class="google-btn">
-            <span class="google-icon"></span>
-            <span>Sign in with Google</span>
-        </button>
-        <button id="connectToOutlook" class="microsoft-btn">
-            <span class="microsoft-icon"></span>
-            <span>Sign in with Microsoft</span>
-        </button>
+        <!-- Login view content -->
     </div>
 
     <div id="main-view" style="display: none;">
         <header>
+            <img src="images/flextime-logo.png" alt="FlexTime Logo" class="main-logo">
             <h1>FlexTime</h1>
             <div class="user-info">
                 <span id="trophy-count">🏆 <span id="total-exercises">0</span></span>
                 <span id="user-profile">👤 <span id="user-name">User</span></span>
             </div>
         </header>
-        <div class="calendar">
-            <button id="prev-week">←</button>
-            <div id="week-view"></div>
-            <button id="next-week">→</button>
-        </div>
-        <div class="exercises">
-            <h2>Exercises</h2>
-            <ul id="exercise-list"></ul>
-        </div>
-        <button id="log-exercise">Log Exercise</button>
+        <!-- Rest of your main view content -->
     </div>
     <script src="popup.js"></script>
 </body>

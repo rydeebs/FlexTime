@@ -1,13 +1,13 @@
 console.log('Background script loaded');
 
-const MS_CLIENT_ID = 'YOUR_AZURE_APPLICATION_CLIENT_ID'; // Replace with your actual Azure client ID
+const MS_CLIENT_ID = 'dd4c37c3-3a02-44e3-9947-df74b9b56c2b';
 
 // Constants for workout levels
 const WORKOUT_LEVELS = {
     Entry: { weekly_goal: 5, exercises: ['10 Lunges', '10 Pushups', '30s Plank', '10 Situps', '10 Bodyweight Squats'] },
     Senior: { weekly_goal: 10, exercises: ['15 Lunges', '15 Pushups', '45s Plank', '15 Situps', '15 Bodyweight Squats', '10 Close-grip Pushups', '30s Side Plank (each side)'] },
     Boss: { weekly_goal: 15, exercises: ['20 Lunges', '20 Pushups', '60s Plank', '20 Situps', '20 Bodyweight Squats', '15 Close-grip Pushups', '45s Side Plank (each side)', '10 Burpees', '20 Russian Twists'] },
-    Goggins: { weekly_goal: 20, exercises: ['25 Lunges', '25 Pushups', '90s Plank', '25 Situps', '25 Bodyweight Squats', '20 Close-grip Pushups', '60s Side Plank (each side)', '15 Burpees', '30 Russian Twists', '30 Mountain Climbers'] }
+    CEO: { weekly_goal: 20, exercises: ['25 Lunges', '25 Pushups', '90s Plank', '25 Situps', '25 Bodyweight Squats', '20 Close-grip Pushups', '60s Side Plank (each side)', '15 Burpees', '30 Russian Twists', '30 Mountain Climbers'] }
 };
 
 chrome.runtime.onInstalled.addListener(() => {

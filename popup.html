@@ -1,27 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html>
+  <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlexTime</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div id="login-view">
-        <!-- Login view content -->
-    </div>
-
-    <div id="main-view" style="display: none;">
-        <header>
-            <img src="images/flextime-logo.png" alt="FlexTime Logo" class="main-logo">
-            <h1>FlexTime</h1>
-            <div class="user-info">
-                <span id="trophy-count">🏆 <span id="total-exercises">0</span></span>
-                <span id="user-profile">👤 <span id="user-name">User</span></span>
-            </div>
-        </header>
-        <!-- Rest of your main view content -->
-    </div>
-    <script src="popup.js"></script>
-</body>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="dist/bundle.js" type="module"></script>
+  </body>
 </html>
